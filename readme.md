@@ -1,6 +1,6 @@
 This is a python script for the Makerlife Weatherstation to push data via MQTT to e.g. Homeassistant. To get it work with homeassistant, a MQTT broker has to be configured and filled in to the script. Also a couple of sensors has to be added to HA. 
 
-The data is pushed every 5 min. The time to can be changed if the interval variable is changed. The wind measurement is done during the interval secoconds. Each publish consits of 15 measurement rounds.
+The data is pushed every 5 min. The time to can be changed if the interval variable is changed. The wind measurement is done during the interval seconds. Each publish consists of 15 measurement rounds.
 
 Paho Mqtt has to be added to your python installation. 
 `pip install paho-mqtt` <br>
