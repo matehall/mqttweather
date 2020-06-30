@@ -13,12 +13,17 @@ def on_connect(client, userdata, flags, rc):
     else:
         print("Bad connetion Retruned Code=", rc)
 
+MQTT_SERVER_IP = "192.168.1.136"
+MQTT_CLIENT_NAME = "weather"
+MQTT_TOPIC = "domoticz/in"
+RAIN_DOMOTICZ_ID = 68
+TEMP_DOMOTICZ_ID = 67
+WIND_DOMOTICZ_ID = 69
 
-mqtt_c = mqtt.Client("weather")
+mqtt_c = mqtt.Client(MQTT_CLIENT_NAME)
 mqtt_c.on_connect = on_connect
-mqtt_c.username_pw_set("homeassistant", password=" ")
 print("Connecting to MQTT server")
-mqtt_c.connect("192.168.1.136")
+mqtt_c.connect(MQTT_SERVER_IP)
 mqtt_c.loop_start()
 
 dia_m = 0.18
@@ -28,9 +33,7 @@ rain_cum = 0
 interval = 4
 ADJUSTMENT = 1.18 * (interval / 5)
 BUCKET_SIZE = 0.2794
-rain_domoticz_id = 68
-temp_domoticz_id = 67
-wind_domoticz_id = 69
+
 circ_m = dia_m * math.pi
 wind_speed_sensor = DigitalInputDevice(17, pull_up=True)
 temp_sensor = W1ThermSensor()
@@ -74,40 +77,44 @@ while True:
     i += 1
     if i == 15:
         temper = temperature()
-        topic = "domoticz/in"
         speed_avg = sum(speed, 0.00) / len(speed)
         speed_gust = max(speed)
 
         payload = json.dumps(
             {
-                "idx": rain_domoticz_id,
+                "idx": RAIN_DOMOTICZ_ID,
                 "nvalue": 0,
                 "svalue": "{rain_cum};{rain_cum}".format(**locals()),
             }
         )
-        mqtt_c.publish(topic, payload)
+        mqtt_c.publish(MQTT_TOPIC, payload)
 
-#        print("Publish data: " + payload)
+        #print("Publish data: " + payload)
 
-        payload = json.dumps({"idx": temp_domoticz_id, "nvalue": 0, "svalue": "{temper}".format(**locals())})
-        mqtt_c.publish(topic, payload)
+        payload = json.dumps(
+            {
+                "idx": TEMP_DOMOTICZ_ID,
+                "nvalue": 0,
+                "svalue": "{temper}".format(**locals()),
+            }
+        )
+        mqtt_c.publish(MQTT_TOPIC, payload)
 
-#        print("Publish data: " + payload)
+        #print("Publish data: " + payload)
         temper_windchill = temper - (speed_avg * 0.7)
         payload = json.dumps(
             {
-                "idx": wind_domoticz_id,
+                "idx": WIND_DOMOTICZ_ID,
                 "nvalue": 0,
                 "svalue": "0;S;{speed_avg}*10;{speed_gust}*10;{temper};{temper_windchill}".format(**locals()),
             }
         )
-        mqtt_c.publish(topic, payload)
+        mqtt_c.publish(MQTT_TOPIC, payload)
 
-#        print("Publish data: " + payload)
+        #print("Publish data: " + payload)
 
         i = 0
         speed.clear()
     else:
         pass
-
 

@@ -1,38 +1,30 @@
-This is a python script for the Makerlife Weatherstation to push data via MQTT to e.g. Homeassistant. To get it work with homeassistant, a MQTT broker has to be configured and filled in to the script. Also a couple of sensors has to be added to HA. 
+This is a python script for the Makerlife Weatherstation to push data via MQTT to Domoticz. Is is base on github:kobbas/mqttweather.
+It will publish temperature, rain and wind values on the domoticz/in topic. 
 
 The data is pushed every 5 min. The time to can be changed if the interval variable is changed. The wind measurement is done during the interval seconds. Each publish consists of 15 measurement rounds.
 
+Things you need to do to get it working.
+
 Paho Mqtt has to be added to your python installation. 
+
 `pip install paho-mqtt` <br>
 
-Edit the scirpt with your MQTT broker IP and Pass. <br>
+Edit the script with your MQTT broker IP and Pass.
+```
+MQTT_SERVER_IP = "192.168.1.136"
+```
+
+Update the IDs to match the idx in domoticz for the devices.
+```
+RAIN_DOMOTICZ_ID = 68
+TEMP_DOMOTICZ_ID = 67
+WIND_DOMOTICZ_ID = 69
+```
+For setting up MQTT for Domiticz look here ["MQTT Client Gateway"](https://www.domoticz.com/wiki/MQTT#Add_hardware_.22MQTT_Client_Gateway.22)
 
 Login to the you raspi via SSH. Start the script with:<br>
 
-`nohup python weather.py &` <br>
+`nohup python weather.py &`
 
 This enables to logut from the pi without closing the down the script.
 
-
-Example of configuration.yaml:
-```yaml
-sensor:
-  - platform: mqtt
-    state_topic: "outside/weather/"
-    icon: mdi:weather-windy
-    name: 'Windspeed'
-    unit_of_measurement: 'm/s'
-    value_template: '{{ value_json.windspeed | round(1) }}'
-  - platform: mqtt
-    state_topic: "outside/weather/"
-    icon: mdi:thermometer-lines
-    name: 'Temperaure'
-    unit_of_measurement: '°C'
-    value_template: '{{ value_json.temperature | round(1) }}'
-  - platform: mqtt
-    state_topic: "outside/weather/"
-    icon: mdi:weather-rainy
-    name: 'Rain'
-    unit_of_measurement: 'mm'
-    value_template: '{{ value_json.rain | round(1) }}'
-```
