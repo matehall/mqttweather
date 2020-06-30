@@ -27,4 +27,3 @@ Login to the you raspi via SSH. Start the script with:<br>
 `nohup python weather.py &`
 
 This enables to logut from the pi without closing the down the script.
-
