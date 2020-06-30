@@ -102,11 +102,14 @@ while True:
 
         #print("Publish data: " + payload)
         temper_windchill = temper - (speed_avg * 0.7)
+        speed_avg_adjusted = speed_avg * 10
+        speed_gust_adjusted = speed_gust * 10
+
         payload = json.dumps(
             {
                 "idx": WIND_DOMOTICZ_ID,
                 "nvalue": 0,
-                "svalue": "0;S;{speed_avg}*10;{speed_gust}*10;{temper};{temper_windchill}".format(**locals()),
+                "svalue": "0;S;{speed_avg_adjusted};{speed_gust_adjusted};{temper};{temper_windchill}".format(**locals()),
             }
         )
         mqtt_c.publish(MQTT_TOPIC, payload)
