@@ -23,7 +23,7 @@ dia_m = 0.18
 bucket_count = 0
 wind_count = 0
 rain_cum = 0
-interval = 2
+interval = 4
 ADJUSTMENT = 1.18 * (interval / 5)
 BUCKET_SIZE = 0.2794
 rain_domoticz_id = 68
@@ -74,7 +74,8 @@ while True:
         temper = temperature()
         topic = "domoticz/in"
         speed_avg = sum(speed, 0.00) / len(speed)
-
+        speed_gust = max(speed)
+        
        payload = json.dumps(
             {
                 "idx": rain_domoticz_id,
