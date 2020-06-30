@@ -13,6 +13,7 @@ def on_connect(client, userdata, flags, rc):
     else:
         print("Bad connetion Returned Code=", rc)
 
+
 MQTT_SERVER_IP = "192.168.1.136"
 MQTT_CLIENT_NAME = "weather"
 MQTT_TOPIC = "domoticz/in"
@@ -20,7 +21,7 @@ RAIN_DOMOTICZ_ID = 68
 TEMP_DOMOTICZ_ID = 67
 WIND_DOMOTICZ_ID = 69
 
-INTERVAL = 20 #20 = 5 min
+INTERVAL = 20  # 20 = 5 min
 
 print("Connecting to MQTT server")
 
@@ -91,7 +92,7 @@ while True:
         )
         mqtt_c.publish(MQTT_TOPIC, payload)
 
-        #print("Publish data: " + payload)
+        # print("Publish data: " + payload)
 
         payload = json.dumps(
             {
@@ -102,7 +103,7 @@ while True:
         )
         mqtt_c.publish(MQTT_TOPIC, payload)
 
-        #print("Publish data: " + payload)
+        # print("Publish data: " + payload)
         temper_windchill = temper - (speed_avg * 0.7)
         speed_avg_adjusted = speed_avg * 10
         speed_gust_adjusted = speed_gust * 10
@@ -119,7 +120,7 @@ while True:
         )
         mqtt_c.publish(MQTT_TOPIC, payload)
 
-        #print("Publish data: " + payload)
+        # print("Publish data: " + payload)
 
         i = 0
         speed.clear()
