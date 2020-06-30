@@ -17,8 +17,10 @@ def on_connect(client, userdata, flags, rc):
 mqtt_c = mqtt.Client("weather")
 mqtt_c.on_connect = on_connect
 mqtt_c.username_pw_set("homeassistant", password=" ")
+print("Connecting to MQTT server")
 mqtt_c.connect("192.168.1.136")
 mqtt_c.loop_start()
+
 dia_m = 0.18
 bucket_count = 0
 wind_count = 0
@@ -75,8 +77,8 @@ while True:
         topic = "domoticz/in"
         speed_avg = sum(speed, 0.00) / len(speed)
         speed_gust = max(speed)
-        
-       payload = json.dumps(
+
+        payload = json.dumps(
             {
                 "idx": rain_domoticz_id,
                 "nvalue": 0,
@@ -91,20 +93,21 @@ while True:
         mqtt_c.publish(topic, payload)
 
 #        print("Publish data: " + payload)
-
+        temper_windchill = temper - (speed_avg * 0.7)
         payload = json.dumps(
             {
                 "idx": wind_domoticz_id,
                 "nvalue": 0,
-                "svalue": "0;S;{speed_avg};0;0;0".format(**locals()),
+                "svalue": "0;S;{speed_avg}*10;{speed_gust}*10;{temper};{temper_windchill}".format(**locals()),
             }
         )
         mqtt_c.publish(topic, payload)
 
-        print("Publish data: " + payload)
+#        print("Publish data: " + payload)
 
         i = 0
         speed.clear()
     else:
         pass
+
 
