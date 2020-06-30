@@ -11,7 +11,7 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected OK")
     else:
-        print("Bad connetion Retruned Code=", rc)
+        print("Bad connetion Returned Code=", rc)
 
 MQTT_SERVER_IP = "192.168.1.136"
 MQTT_CLIENT_NAME = "weather"
@@ -20,9 +20,12 @@ RAIN_DOMOTICZ_ID = 68
 TEMP_DOMOTICZ_ID = 67
 WIND_DOMOTICZ_ID = 69
 
+INTERVAL = 20 #20 = 5 min
+
+print("Connecting to MQTT server")
+
 mqtt_c = mqtt.Client(MQTT_CLIENT_NAME)
 mqtt_c.on_connect = on_connect
-print("Connecting to MQTT server")
 mqtt_c.connect(MQTT_SERVER_IP)
 mqtt_c.loop_start()
 
@@ -30,8 +33,7 @@ dia_m = 0.18
 bucket_count = 0
 wind_count = 0
 rain_cum = 0
-interval = 4
-ADJUSTMENT = 1.18 * (interval / 5)
+ADJUSTMENT = 1.18 * (INTERVAL / 5)
 BUCKET_SIZE = 0.2794
 
 circ_m = dia_m * math.pi
@@ -63,7 +65,7 @@ def temperature():
     return temp_sensor.get_temperature()
 
 
-windspeed = threading.Thread(name="wind", target=wind(interval))
+windspeed = threading.Thread(name="wind", target=wind(INTERVAL))
 raindata = threading.Thread(name="rain", target=rain)
 windspeed.start()
 raindata.start()
@@ -72,8 +74,8 @@ rain_sensor.when_activated = rain
 speed = []
 i = 0
 while True:
-    sleep(interval)
-    speed.append(wind(interval))
+    sleep(INTERVAL)
+    speed.append(wind(INTERVAL))
     i += 1
     if i == 15:
         temper = temperature()
@@ -105,11 +107,14 @@ while True:
         speed_avg_adjusted = speed_avg * 10
         speed_gust_adjusted = speed_gust * 10
 
+        wind_bearing = 0
+        wind_direction = "S"
+
         payload = json.dumps(
             {
                 "idx": WIND_DOMOTICZ_ID,
                 "nvalue": 0,
-                "svalue": "0;S;{speed_avg_adjusted};{speed_gust_adjusted};{temper};{temper_windchill}".format(**locals()),
+                "svalue": "{wind_bearing} ;{wind_direction};{speed_avg_adjusted};{speed_gust_adjusted};{temper};{temper_windchill}".format(**locals()),
             }
         )
         mqtt_c.publish(MQTT_TOPIC, payload)
